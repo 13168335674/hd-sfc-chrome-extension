@@ -6,7 +6,7 @@ import { WS_STATUS, CHROME_KEY } from "./config/constant";
 
 const formData = reactive({
   port: lStorage.get("port") || 5000,
-  enable: lStorage.get("enable") || true,
+  enable: lStorage.get("enable") || false,
   hmrEnable: lStorage.get("hmrEnable") || false,
 });
 
@@ -22,9 +22,13 @@ const useHMR = (src = "") => {
 const setWsStatusChange = (status = WS_STATUS.PROCESSING) => {
   chrome?.runtime?.sendMessage(
     { action: CHROME_KEY.STATUS_CHANGE, status },
-    function (response) {
-      console.log(`ADI-LOG => STATUS_CHANGE.`, status);
-    }
+    (result) => {
+      if (!window.chrome.runtime.lastError) {
+        // message processing code goes here
+      } else {
+        // error handling code goes here
+      }
+    },
   );
 };
 
@@ -53,7 +57,7 @@ function initChromeListener() {
   chrome?.runtime?.onMessage.addListener(function (
     request,
     sender,
-    sendResponse
+    sendResponse,
   ) {
     switch (request.action) {
       case CHROME_KEY.START_SERVER: {

@@ -23,7 +23,7 @@ const startServerMain = () => {
   // console.log("ADI-LOG => startServerMain");
   const { port, enable, hmrEnable } = formData;
   chrome?.tabs?.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(
+    chrome?.tabs?.sendMessage(
       tabs[0].id,
       {
         action: CHROME_KEY.START_SERVER,
@@ -66,11 +66,7 @@ const statusType = computed(() => {
 });
 
 function initChromeListener() {
-  chrome?.runtime?.onMessage.addListener(function (
-    request,
-    sender,
-    sendResponse
-  ) {
+  chrome?.runtime?.onMessage.addListener(function (request, sender, sendResponse) {
     switch (request.action) {
       case CHROME_KEY.STATUS_CHANGE: {
         formData.status = request.status;
@@ -107,12 +103,7 @@ onMounted(() => {
     banner
   ></a-alert>
   <a-card :loading="loading" title="HD Extension" class="cardBox">
-    <a-form
-      :model="formData"
-      name="basic"
-      autocomplete="off"
-      @finish="onFinish"
-    >
+    <a-form :model="formData" name="basic" autocomplete="off" @finish="onFinish">
       <a-form-item label="是否启用:" name="enable">
         <a-switch v-model:checked="formData.enable" />
       </a-form-item>
@@ -120,19 +111,48 @@ onMounted(() => {
         <a-switch v-model:checked="formData.hmrEnable" />
       </a-form-item>
       <a-form-item label="端口号:" name="port">
-        <a-input v-model:value="formData.port" />
+        <a-input v-model:value="formData.port" class="form__port" />
       </a-form-item>
 
       <a-form-item style="text-align: right">
-        <a-button type="primary" html-type="submit">Async</a-button>
+        <a-button type="primary" html-type="submit" class="form__submit">SYNC</a-button>
       </a-form-item>
     </a-form>
   </a-card>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .cardBox {
   max-height: 500px;
   overflow: auto;
+  .form__port {
+    background: #e5e5e5;
+    color: #5c5c5c;
+    padding: 6px 14px;
+    &:hover, &:focus {
+      border-color: #d9d9d9;
+    }
+  }
+  .form__submit {
+    background: #4285f4;
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+    padding: 4px 15px;
+    height: 36px;
+  }
+}
+</style>
+
+<style lang="scss">
+.cardBox {
+  .ant-card-head-title {
+    color: #4285f4;
+    font-weight: bold;
+    font-size: 22px;
+  }
+  .ant-form-item-label > label {
+    color: #666;
+  }
 }
 </style>

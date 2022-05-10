@@ -7,13 +7,16 @@
     "48": "src/icons/128.png",
     "128": "src/icons/128.png"
   },
+  "action": {
+    "default_popup": "index.html"
+  },
   "background": {
     "service_worker": "src/background.js"
   },
   "content_scripts": [
     {
       "js": ["src/content-scripts/index.js"],
-      "matches": ["http://hdm.aaa.cn.adi001.dev.cc/*"]
+      "matches": ["<all_urls>"]
     }
   ],
   "incognito": "split"
