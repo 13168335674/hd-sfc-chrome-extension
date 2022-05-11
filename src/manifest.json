@@ -16,7 +16,11 @@
   "content_scripts": [
     {
       "js": ["src/content-scripts/index.js"],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "http://hdm.aaa.cn.adi001.dev.cc/*",
+        "http://hdm.aaa.cn.hzq.dev.cc/*",
+        "http://hdm.aaa.cn.demon.dev.cc/*"
+      ]
     }
   ],
   "incognito": "split"
