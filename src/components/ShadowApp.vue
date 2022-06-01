@@ -1,8 +1,11 @@
 <script setup>
 import { onMounted, reactive, watchEffect, watch } from "vue";
 import lStorage from "../utils/localstore";
+import { runScript, appendScript } from "../utils";
 
 import { WS_STATUS, CHROME_KEY } from "./config/constant";
+
+import pkg from '../../package.json';
 
 const formData = reactive({
   port: lStorage.get("port") || 5000,
@@ -13,10 +16,10 @@ const formData = reactive({
 let wsInstance = null;
 
 const useHMR = (src = "") => {
-  const scriptEle = document.createElement("script");
-  scriptEle.type = "module";
-  scriptEle.src = src;
-  document.body.appendChild(scriptEle);
+  appendScript(src);
+  runScript(
+    `HD_SFC_CHROME_EXTENSION__LOCAL__HMR_HOOK  && HD_SFC_CHROME_EXTENSION__LOCAL__HMR_HOOK()`
+  );
 };
 
 const setWsStatusChange = (status = WS_STATUS.PROCESSING) => {
@@ -28,7 +31,7 @@ const setWsStatusChange = (status = WS_STATUS.PROCESSING) => {
       } else {
         // error handling code goes here
       }
-    },
+    }
   );
 };
 
@@ -37,6 +40,7 @@ const setFormDataLocalstore = () => {
   Object.keys(formData).forEach((key) => {
     lStorage.set(key, formData[key]);
   });
+  lStorage.set("version", pkg.version);
 };
 
 watchEffect(() => {
@@ -57,7 +61,7 @@ function initChromeListener() {
   chrome?.runtime?.onMessage.addListener(function (
     request,
     sender,
-    sendResponse,
+    sendResponse
   ) {
     switch (request.action) {
       case CHROME_KEY.START_SERVER: {
@@ -72,6 +76,11 @@ function initChromeListener() {
       }
     }
   });
+}
+
+function initHdSfcChromeExtensionLocalHmrHook(localHost) {
+  const src = `${localHost}/.vscode/HD_SFC_CHROME_EXTENSION/hooks/hmr.js`;
+  appendScript(src);
 }
 
 function createServe(port) {
@@ -89,6 +98,7 @@ function createServe(port) {
 
   wsInstance.onopen = function () {
     setWsStatusChange(WS_STATUS.SUCCESS);
+    formData.hmrEnable && initHdSfcChromeExtensionLocalHmrHook(localHost);
   };
 
   wsInstance.onerror = function () {

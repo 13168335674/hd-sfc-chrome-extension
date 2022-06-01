@@ -1,3 +1,5 @@
 import pck from "../../package.json";
 
-export const localStorePrefix = (pck.name + "__local__").toUpperCase();
+const prefix = pck.name.split('-').join('_');
+
+export const localStorePrefix = (prefix + "__local__").toUpperCase();

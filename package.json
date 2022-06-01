@@ -1,7 +1,7 @@
 {
   "name": "hd-sfc-chrome-extension",
-  "description": "vite-chrome-extension",
-  "version": "1.0.0",
+  "description": "hd-sfc-chrome-extension",
+  "version": "2.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

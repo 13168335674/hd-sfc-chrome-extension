@@ -17,9 +17,7 @@
     {
       "js": ["src/content-scripts/index.js"],
       "matches": [
-        "http://hdm.aaa.cn.adi001.dev.cc/*",
-        "http://hdm.aaa.cn.hzq.dev.cc/*",
-        "http://hdm.aaa.cn.demon.dev.cc/*"
+        "http://*.dev.cc/*"
       ]
     }
   ],
