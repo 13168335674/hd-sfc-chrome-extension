@@ -70,7 +70,7 @@ function initChromeListener() {
     switch (request.action) {
       case CHROME_KEY.STATUS_CHANGE: {
         formData.status = request.status;
-        console.log(`ADI-LOG => STATUS_CHANGE`, request.status);
+        setFormDataLocalstore();
         break;
       }
     }

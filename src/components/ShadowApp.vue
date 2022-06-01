@@ -5,7 +5,7 @@ import { runScript, appendScript } from "../utils";
 
 import { WS_STATUS, CHROME_KEY } from "./config/constant";
 
-import pkg from '../../package.json';
+import pkg from "../../package.json";
 
 const formData = reactive({
   port: lStorage.get("port") || 5000,
@@ -43,15 +43,14 @@ const setFormDataLocalstore = () => {
   lStorage.set("version", pkg.version);
 };
 
-watchEffect(() => {
-  setFormDataLocalstore();
-  createServe(formData.port);
-});
-
-watch(formData, () => {
-  setFormDataLocalstore();
-  createServe(formData.port);
-});
+watch(
+  () => formData,
+  () => {
+    setFormDataLocalstore();
+    createServe(formData.port);
+  },
+  { deep: true, immediate: true }
+);
 
 onMounted(() => {
   initChromeListener();
@@ -106,6 +105,7 @@ function createServe(port) {
   };
 
   wsInstance.onmessage = function (event) {
+    setWsStatusChange(WS_STATUS.SUCCESS);
     // console.log("ADI-LOG => onMessage", event.data);
     let data = event.data;
     try {
