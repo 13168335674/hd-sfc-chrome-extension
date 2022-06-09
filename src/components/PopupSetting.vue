@@ -4,6 +4,7 @@ import lStorage from "../utils/localstore";
 import { WS_STATUS, CHROME_KEY } from "./config/constant";
 
 const loading = ref(false);
+const btnLoading = ref(false);
 
 const formData = reactive({
   port: lStorage.get("port") || 5000,
@@ -79,8 +80,12 @@ function initChromeListener() {
 }
 
 function onFinish(values) {
+  btnLoading.value = true;
   setFormDataLocalstore();
   startServerMain();
+  setTimeout(() => {
+    btnLoading.value = false;
+  }, 500);
   // console.log("ADI-LOG => onFinish:", values, formData);
 }
 
@@ -115,7 +120,7 @@ onMounted(() => {
       </a-form-item>
 
       <a-form-item style="text-align: right">
-        <a-button type="primary" html-type="submit" class="form__submit">SYNC</a-button>
+        <a-button type="primary" :loading="btnLoading" html-type="submit" class="form__submit">SYNC</a-button>
       </a-form-item>
     </a-form>
   </a-card>
