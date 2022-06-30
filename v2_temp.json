@@ -1,0 +1,32 @@
+{
+  "name": "hd-sfc-chrome-extension",
+  "description": "hd-sfc-chrome-extension",
+  "manifest_version": 2,
+  "icons": {
+    "16": "src/icons/128.png",
+    "48": "src/icons/128.png",
+    "128": "src/icons/128.png"
+  },
+  "browser_action": {
+    "default_title": "hd-sfc-chrome-extension",
+    "default_popup": "index.html",
+    "default_icon": "src/icons/128.png"
+  },
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["assets/content-script-loader.index.js.d918cbcd.0fb07d66.js"],
+      "matches": ["http://*.dev.cc/*"]
+    }
+  ],
+  "incognito": "split",
+  "version": "2.0.0",
+  "web_accessible_resources": [
+    "assets/constant.0483d017.js",
+    "assets/index.js.d918cbcd.js"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

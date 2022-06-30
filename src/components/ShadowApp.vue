@@ -1,16 +1,24 @@
-<script setup>
-import { onMounted, reactive, watchEffect, watch } from "vue";
+<script setup lang="ts">
+import { onMounted, reactive, watch } from "vue";
 import lStorage from "../utils/localstore";
 
 import { WS_STATUS, CHROME_KEY } from "./config/constant";
 
-const formData = reactive({
+import pkg from "../../package.json";
+
+interface IFormData {
+  port: number;
+  enable: boolean;
+  hmrEnable: boolean;
+}
+
+const formData: IFormData = reactive({
   port: lStorage.get("port") || 5000,
   enable: lStorage.get("enable") || true,
   hmrEnable: lStorage.get("hmrEnable") || false,
 });
 
-let wsInstance = null;
+let wsInstance: WebSocket | null = null;
 
 const useHMR = (src = "") => {
   const scriptEle = document.createElement("script");
@@ -22,16 +30,21 @@ const useHMR = (src = "") => {
 const setWsStatusChange = (status = WS_STATUS.PROCESSING) => {
   chrome?.runtime?.sendMessage(
     { action: CHROME_KEY.STATUS_CHANGE, status },
-    function (response) {
-      console.log(`ADI-LOG => STATUS_CHANGE.`, status);
+    (result) => {
+      if (!chrome.runtime.lastError) {
+        // message processing code goes here
+      } else {
+        // error handling code goes here
+      }
     }
   );
 };
 
 const setFormDataLocalstore = () => {
   // console.log("ADI-LOG => setFormDataLocalstore");
+  type keyType = keyof typeof formData;
   Object.keys(formData).forEach((key) => {
-    lStorage.set(key, formData[key]);
+    lStorage.set(key, formData[key as keyType]);
   });
 };
 
@@ -70,7 +83,12 @@ function initChromeListener() {
   });
 }
 
-function createServe(port) {
+function initHdSfcChromeExtensionLocalHmrHook(localHost: string) {
+  const src = `${localHost}/.vscode/HD_SFC_CHROME_EXTENSION/hooks/hmr.js`;
+  appendScript(src);
+}
+
+function createServe(port: number) {
   if (wsInstance) {
     wsInstance.close();
   }
@@ -91,7 +109,8 @@ function createServe(port) {
     setWsStatusChange(WS_STATUS.ERROR);
   };
 
-  wsInstance.onmessage = function (event) {
+  wsInstance.onmessage = function (event: any) {
+    setWsStatusChange(WS_STATUS.SUCCESS);
     // console.log("ADI-LOG => onMessage", event.data);
     let data = event.data;
     try {

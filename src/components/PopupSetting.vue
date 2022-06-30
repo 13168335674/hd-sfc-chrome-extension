@@ -1,11 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, watch, onMounted, computed } from "vue";
 import lStorage from "../utils/localstore";
 import { WS_STATUS, CHROME_KEY } from "./config/constant";
 
 const loading = ref(false);
 
-const formData = reactive({
+interface IFormData {
+  port: number;
+  status: string;
+  enable: boolean;
+  hmrEnable: boolean;
+}
+const formData: IFormData = reactive({
   port: lStorage.get("port") || 5000,
   status: lStorage.get("status") || WS_STATUS.PROCESSING,
   enable: lStorage.get("enable") || false,
@@ -14,8 +20,9 @@ const formData = reactive({
 
 const setFormDataLocalstore = () => {
   // console.log("ADI-LOG => setFormDataLocalstore");
+  type keyType = keyof typeof formData;
   Object.keys(formData).forEach((key) => {
-    lStorage.set(key, formData[key]);
+    lStorage.set(key, formData[key as keyType]);
   });
 };
 
@@ -23,15 +30,15 @@ const startServerMain = () => {
   // console.log("ADI-LOG => startServerMain");
   const { port, enable, hmrEnable } = formData;
   chrome?.tabs?.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(
-      tabs[0].id,
+    chrome?.tabs?.sendMessage(
+      (tabs[0] as any).id,
       {
         action: CHROME_KEY.START_SERVER,
         port,
         enable,
         hmrEnable,
       },
-      function (response) {
+      function (response: string) {
         console.log("ADI-LOG => START_SERVER response", response);
       }
     );
@@ -82,7 +89,8 @@ function initChromeListener() {
   });
 }
 
-function onFinish(values) {
+function onFinish(values: IFormData) {
+  btnLoading.value = true;
   setFormDataLocalstore();
   startServerMain();
   // console.log("ADI-LOG => onFinish:", values, formData);
@@ -124,7 +132,13 @@ onMounted(() => {
       </a-form-item>
 
       <a-form-item style="text-align: right">
-        <a-button type="primary" html-type="submit">Async</a-button>
+        <a-button
+          type="primary"
+          :loading="btnLoading"
+          html-type="submit"
+          class="form__submit"
+          >SYNC</a-button
+        >
       </a-form-item>
     </a-form>
   </a-card>
@@ -134,5 +148,35 @@ onMounted(() => {
 .cardBox {
   max-height: 500px;
   overflow: auto;
+  .form__port {
+    background: #e5e5e5;
+    color: #5c5c5c;
+    padding: 6px 14px;
+    &:hover,
+    &:focus {
+      border-color: #d9d9d9;
+    }
+  }
+  .form__submit {
+    background: #4285f4;
+    display: block;
+    width: 100%;
+    border-radius: 4px;
+    padding: 4px 15px;
+    height: 36px;
+  }
+}
+</style>
+
+<style lang="scss">
+.cardBox {
+  .ant-card-head-title {
+    color: #4285f4;
+    font-weight: bold;
+    font-size: 22px;
+  }
+  .ant-form-item-label > label {
+    color: #666;
+  }
 }
 </style>

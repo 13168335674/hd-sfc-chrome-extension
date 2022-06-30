@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import PopupSetting from "./components/PopupSetting.vue";
 </script>
 
